@@ -147,10 +147,10 @@ public class Clock extends View {
             }
 
             int startX = (int) (mCenterX + rPadded * Math.cos(Math.toRadians(i)));
-            int startY = (int) (mCenterX - rPadded * Math.sin(Math.toRadians(i)));
+            int startY = (int) (mCenterY - rPadded * Math.sin(Math.toRadians(i)));
 
             int stopX = (int) (mCenterX + rEnd * Math.cos(Math.toRadians(i)));
-            int stopY = (int) (mCenterX - rEnd * Math.sin(Math.toRadians(i)));
+            int stopY = (int) (mCenterY - rEnd * Math.sin(Math.toRadians(i)));
 
             canvas.drawLine(startX, startY, stopX, stopY, paint);
 
@@ -197,8 +197,25 @@ public class Clock extends View {
     private void drawHoursValues(Canvas canvas) {
         // Default Color:
         // - hoursValuesColor
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setStrokeCap(Paint.Cap.ROUND);
+        paint.setStrokeWidth(mWidth * DEFAULT_DEGREE_STROKE_WIDTH);
+        paint.setColor(degreesColor);
+        paint.setTextAlign(Paint.Align.CENTER);
+        paint.setTextSize(90);
 
+        int rEnd = mCenterX - (int) (mWidth * 0.1f);
 
+        for(int i = 0 ; i < FULL_ANGLE ; i += 30 )
+        {
+            int value = i / 30  + 3 ;
+            if ( value > 12 ) value -= 12;
+
+            int posX = (int) (mCenterX + rEnd * Math.cos(Math.toRadians(i)));
+            int posY = (int) (mCenterY + rEnd * Math.sin(Math.toRadians(i))+mWidth*0.03f);
+            canvas.drawText(Integer.toString(value),posX,posY,paint);
+        }
     }
 
     /**
@@ -213,6 +230,47 @@ public class Clock extends View {
         // - hoursNeedleColor
         // - minutesNeedleColor
 
+
+
+        Calendar calendar = Calendar.getInstance();
+        int hour = calendar.get(Calendar.HOUR);
+        int minute = calendar.get(Calendar.MINUTE);
+        int second = calendar.get(Calendar.SECOND);
+
+        //秒针
+        int second_rEnd = mCenterX - (int) (mWidth * 0.05f);
+
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(secondsNeedleColor);
+        paint.setStrokeWidth(10f);
+
+        int second_degree = second * 6 - 90;
+        int posX = (int) (mCenterX + second_rEnd * Math.cos(Math.toRadians(second_degree)));
+        int posY = (int) (mCenterY + second_rEnd * Math.sin(Math.toRadians(second_degree)));
+        canvas.drawLine(mCenterX,mCenterY,posX,posY,paint);
+
+        //分针
+        int minute_rEnd = mCenterX - (int) (mWidth * 0.1f);
+
+        paint.setStrokeWidth(20f);
+        paint.setColor(minutesNeedleColor);
+
+        float minute_degree = second * 0.1f + minute * 6 - 90;
+        posX = (int) (mCenterX + minute_rEnd * Math.cos(Math.toRadians(minute_degree)));
+        posY = (int) (mCenterY + minute_rEnd * Math.sin(Math.toRadians(minute_degree)));
+        canvas.drawLine(mCenterX,mCenterY,posX,posY,paint);
+
+        //时针
+        int hour_rEnd = mCenterX - (int) (mWidth * 0.75f);
+
+        paint.setStrokeWidth(30f);
+        paint.setColor(hoursNeedleColor);
+
+        float hour_degree = minute * 0.1f + hour * 6 - 90;
+        posX = (int) (mCenterX + hour_rEnd * Math.cos(Math.toRadians(hour_degree)));
+        posY = (int) (mCenterY + hour_rEnd * Math.sin(Math.toRadians(hour_degree)));
+        canvas.drawLine(mCenterX,mCenterY,posX,posY,paint);
     }
 
     /**
@@ -225,6 +283,13 @@ public class Clock extends View {
         // - centerInnerColor
         // - centerOuterColor
 
+        Paint paint = new Paint();
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(centerOuterColor);
+        canvas.drawCircle(mCenterX,mCenterY,25,paint);
+
+        paint.setColor(centerInnerColor);
+        canvas.drawCircle(mCenterX,mCenterY,15,paint);
     }
 
     public void setShowAnalog(boolean showAnalog) {
